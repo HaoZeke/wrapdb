@@ -47,10 +47,10 @@ def main() -> int:
     input_path = sys.argv[2]
     tmproot = sys.argv[3]
     workdir = sys.argv[4]
-    examples_path = workdir + '/examples'
+    examples_path = f'{workdir}/examples'
     if ':' in examples_path:
         examples_path = examples_path.partition(':')[2]
-    with open(input_path, 'rb') as input_file, tempfile.TemporaryDirectory(dir=tmproot) as tmpdir:
+    with (open(input_path, 'rb') as input_file, tempfile.TemporaryDirectory(dir=tmproot) as tmpdir):
         expected_out = bytes()
         expected_err = bytes()
         ignore_err = False
@@ -68,12 +68,8 @@ def main() -> int:
                 ignore_err = True
             if not l.startswith(b'dnl @'):
                 m4_input += l + b'\n'
-        runargs = []
-        runargs.append(m4_path)
-        runargs.append('-d')
-        for arg in args.split(' '):
-            if len(arg) > 0:
-                runargs.append(arg)
+        runargs = [m4_path, '-d']
+        runargs.extend(arg for arg in args.split(' ') if len(arg) > 0)
         runargs.append('-')
         print('Arguments are: {0}'.format(' '.join(runargs)))
         res = subprocess.run(runargs,
