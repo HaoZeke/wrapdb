@@ -131,9 +131,11 @@ def get_provide(wrap: str):
         provide = config['provide']
         progs = [i.strip() for i in provide.get('program_names', '').split(',')]
         deps = [i.strip() for i in provide.get('dependency_names', '').split(',')]
-        for k in provide:
-            if k not in {'dependency_names', 'program_names'}:
-                deps.append(k.strip())
+        deps.extend(
+            k.strip()
+            for k in provide
+            if k not in {'dependency_names', 'program_names'}
+        )
     progs = [i for i in progs if i]
     deps = [i for i in deps if i]
     return progs, deps

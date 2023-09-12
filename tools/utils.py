@@ -35,7 +35,7 @@ class Version:
         self._v = sequences3
 
     def __str__(self) -> str:
-        return '{} (V={})'.format(self._s, str(self._v))
+        return f'{self._s} (V={str(self._v)})'
 
     def __repr__(self) -> str:
         return f'<Version: {self._s}>'
@@ -61,14 +61,10 @@ class Version:
         return NotImplemented
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, Version):
-            return self._v == other._v
-        return NotImplemented
+        return self._v == other._v if isinstance(other, Version) else NotImplemented
 
     def __ne__(self, other: object) -> bool:
-        if isinstance(other, Version):
-            return self._v != other._v
-        return NotImplemented
+        return self._v != other._v if isinstance(other, Version) else NotImplemented
 
     def __cmp(self, other: 'Version', comparator: T.Callable[[T.Any, T.Any], bool]) -> bool:
         # compare each sequence in order
@@ -96,7 +92,7 @@ def is_linux() -> bool:
     return platform.system().lower() == 'linux'
 
 def is_windows() -> bool:
-    return platform.system().lower() == 'windows' and not "MSYSTEM" in os.environ
+    return platform.system().lower() == 'windows' and "MSYSTEM" not in os.environ
 
 def is_msys() -> bool:
     return platform.system().lower() == 'windows' and "MSYSTEM" in os.environ

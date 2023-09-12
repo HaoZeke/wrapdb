@@ -17,7 +17,7 @@ if __name__ == '__main__':
     source = args.src_rc.read_text(encoding='utf-8')
     all = args.all_rc.read_text(encoding='utf-8')
 
-    version = f"{','.join(args.version.split('.')[0:2])},0"
+    version = f"{','.join(args.version.split('.')[:2])},0"
 
     all = all.replace('"0x040904B0"', '"040904B0"') \
         .replace('TH_VERSION_FIELD', version) \

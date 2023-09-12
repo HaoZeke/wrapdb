@@ -66,7 +66,7 @@ def main(argv):
     verbose('Search path:\n\t' + '\n\t'.join(libdirs))
 
     for libdir in libdirs:
-        p = pathlib.Path(libdir) / 'lib{}.so'.format(libname)
+        p = pathlib.Path(libdir) / f'lib{libname}.so'
         if p.is_file():
             verbose('Found', p)
             p = p.resolve()

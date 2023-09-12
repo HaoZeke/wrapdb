@@ -160,8 +160,7 @@ class TestReleases(unittest.TestCase):
                 self.assertIn(k, PERMITTED_KEYS)
 
     def get_patch_path(self, wrap_section):
-        patch_directory = wrap_section.get('patch_directory')
-        if patch_directory:
+        if patch_directory := wrap_section.get('patch_directory'):
             return Path('subprojects', 'packagefiles', patch_directory)
 
         return None
@@ -226,9 +225,11 @@ class TestReleases(unittest.TestCase):
                         provide = config['provide']
                         progs = [i.strip() for i in provide.get('program_names', '').split(',')]
                         deps = [i.strip() for i in provide.get('dependency_names', '').split(',')]
-                        for k in provide:
-                            if k not in {'dependency_names', 'program_names'}:
-                                deps.append(k.strip())
+                        deps.extend(
+                            k.strip()
+                            for k in provide
+                            if k not in {'dependency_names', 'program_names'}
+                        )
                     progs = [i for i in progs if i]
                     deps = [i for i in deps if i]
                     self.assertEqual(sorted(progs), sorted(info.get('program_names', [])))
@@ -302,25 +303,22 @@ class TestReleases(unittest.TestCase):
         self.assertNotIn('\\', value)
 
     def check_source_url(self, name: str, wrap_section: configparser.SectionProxy, version: str):
-        if name == 'sqlite3':
+        if name == 'netstring-c':
+            # There is no specific version for netstring-c
+            return True
+        elif name == 're2':
+            version = f'{version[:4]}-{version[4:6]}-{version[6:8]}'
+        elif name == 'sqlite3':
             segs = version.split('.')
             assert(len(segs) == 3)
             version = segs[0] + segs[1] + '0' + segs[2]
-        elif name == 're2':
-            version = f'{version[:4]}-{version[4:6]}-{version[6:8]}'
-        elif name == 'netstring-c':
-            # There is no specific version for netstring-c
-            return True
         source_url = wrap_section['source_url']
         version_ = version.replace('.', '_')
         self.assertTrue(version in source_url or version_ in source_url,
                         f'Version {version} not found in {source_url}')
 
     def check_new_release(self, name: str, builddir: str = '_build', deps=None, progs=None):
-        if is_msys():
-            system = 'msys2'
-        else:
-            system = platform.system().lower()
+        system = 'msys2' if is_msys() else platform.system().lower()
         ci = self.ci_config.get(name, {})
         # kept for backwards compatibility
         expect_working = True
@@ -333,9 +331,12 @@ class TestReleases(unittest.TestCase):
             skip_deps = ci.get('skip_dependency_check', [])
             deps = [d for d in deps if d not in skip_deps]
 
-        options = ['-Dpython.install_env=auto', f'-Dwraps={name}']
-        options.append('-Ddepnames={}'.format(','.join(deps or [])))
-        options.append('-Dprognames={}'.format(','.join(progs or [])))
+        options = [
+            '-Dpython.install_env=auto',
+            f'-Dwraps={name}',
+            f"-Ddepnames={','.join(deps or [])}",
+            f"-Dprognames={','.join(progs or [])}",
+        ]
         if ci.get('fatal_warnings', True) and self.fatal_warnings:
             options.append('--fatal-meson-warnings')
         options += [f'-D{o}' for o in ci.get('build_options', [])]
@@ -370,7 +371,10 @@ class TestReleases(unittest.TestCase):
                 print(f'The following packages could be required: {s}')
         elif msys_packages and is_msys():
             if is_ci():
-                subprocess.check_call(['sh', '-lc', '$@', 'bash', 'pacboy', '--noconfirm', 'sync'] + [p + ':p' for p in msys_packages])
+                subprocess.check_call(
+                    ['sh', '-lc', '$@', 'bash', 'pacboy', '--noconfirm', 'sync']
+                    + [f'{p}:p' for p in msys_packages]
+                )
             else:
                 s = ', '.join(msys_packages)
                 print(f'The following packages could be required: {s}')
@@ -394,7 +398,15 @@ class TestReleases(unittest.TestCase):
                 if 'unsupported' in error or 'not supported' in error or 'does not support' in error:
                     print('unsupported, as expected')
                     return
-                elif any('ERROR: '+x in error for x in {'Dependency', 'Program', 'Pkg-config binary', 'CMake binary'}):
+                elif any(
+                    f'ERROR: {x}' in error
+                    for x in {
+                        'Dependency',
+                        'Program',
+                        'Pkg-config binary',
+                        'CMake binary',
+                    }
+                ):
                     if 'not found' in error:
                         print('cannot verify in wrapdb due to missing dependency')
                         return
@@ -417,9 +429,10 @@ class TestReleases(unittest.TestCase):
             return True
         if filename.endswith('.h.meson'):
             return True
-        if subproject in PER_PROJECT_PERMITTED_FILES and filename in PER_PROJECT_PERMITTED_FILES[subproject]:
-            return True
-        return False
+        return (
+            subproject in PER_PROJECT_PERMITTED_FILES
+            and filename in PER_PROJECT_PERMITTED_FILES[subproject]
+        )
 
     def check_files(self, subproject: str, patch_path: Path) -> None:
         tabs: T.List[Path] = []
@@ -433,10 +446,10 @@ class TestReleases(unittest.TestCase):
                 tabs.append(f)
         if tabs:
             tabs_str = ', '.join([str(f) for f in tabs])
-            self.fail('Tabs in meson files are not allows: ' + tabs_str)
+            self.fail(f'Tabs in meson files are not allows: {tabs_str}')
         if not_permitted:
             not_permitted_str = ', '.join([str(f) for f in not_permitted])
-            self.fail('Not permitted files found: ' + not_permitted_str)
+            self.fail(f'Not permitted files found: {not_permitted_str}')
 
 
 if __name__ == '__main__':
