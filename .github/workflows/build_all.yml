@@ -12,7 +12,7 @@ on:
 
 jobs:
   Ubuntu:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: ubuntu-latest
     env:
       TEST_BUILD_ALL: 1
@@ -33,7 +33,7 @@ jobs:
           ./tools/fake_tty.py ./tools/sanity_checks.py
 
   Alpine:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: ubuntu-latest
     steps:
       - uses: jirutka/setup-alpine@v1
@@ -57,7 +57,7 @@ jobs:
         shell: alpine.sh {0}
 
   VisualStudio:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: windows-latest
     strategy:
       matrix:
@@ -90,7 +90,7 @@ jobs:
           python tools/sanity_checks.py
 
   VisualStudio-clang-cl:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: windows-latest
     env:
       CC: clang-cl
@@ -112,7 +112,7 @@ jobs:
           python tools/sanity_checks.py
 
   MSYS2:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: windows-latest
     env:
       TEST_BUILD_ALL: 1
@@ -153,7 +153,7 @@ jobs:
           python tools/sanity_checks.py
 
   MacOS:
-    if: github.event_name != 'schedule' || github.repository == 'mesonbuild/wrapdb'
+    if: github.event_name != 'schedule' || github.repository == 'HaoZeke/wrapdb'
     runs-on: ${{ matrix.platform == 'arm64' && 'macos-14' || 'macos-12' }}
     env:
       TEST_BUILD_ALL: 1

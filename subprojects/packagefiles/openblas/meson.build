@@ -11,7 +11,7 @@
 #
 # NOTE: This is still a work in progress, the Makefiles are canonical
 project('OpenBLAS', ['c', 'fortran'],
-        default_options: ['c_std=c99', 'pkgconfig.relocatable=true'],
+        default_options: ['c_std=c99'],
         version: '0.3.28')
 
 openblas_major_version = 0 # soversion
