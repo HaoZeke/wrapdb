@@ -4093,6 +4093,14 @@
       "1.4.0-1"
     ]
   },
+  "readcon-core": {
+    "dependency_names": [
+      "readcon-core"
+    ],
+    "versions": [
+      "0.14.7-1"
+    ]
+  },
   "re2": {
     "dependency_names": [
       "re2"

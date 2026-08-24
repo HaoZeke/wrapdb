@@ -1458,6 +1458,26 @@
       "rdkafka:WITH_SSL=disabled"
     ]
   },
+  "readcon-core": {
+    "_comment": "cxx wrap builds the Rust crate via cargo; rustc is not on the default image",
+    "alpine_packages": [
+      "cargo",
+      "rust"
+    ],
+    "brew_packages": [
+      "rust"
+    ],
+    "choco_packages": [
+      "rust"
+    ],
+    "debian_packages": [
+      "cargo",
+      "rustc"
+    ],
+    "msys_packages": [
+      "rust"
+    ]
+  },
   "re2": {
     "build_options": [
       "cpp_std=c++14"
